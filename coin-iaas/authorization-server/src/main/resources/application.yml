@@ -1,0 +1,12 @@
+server:
+  port: 9999
+spring:
+  application:
+    name: authorization-server
+  cloud:
+    nacos:
+      discovery:
+        serverAddr: localhost:8848
+  redis:
+    host: localhost
+    port: 6379
