@@ -32,3 +32,6 @@ spring:
           uri: lb://admin-service #转发到服务
           predicates:
             - Path=/admin/** #请求url
+  redis:
+    host: localhost
+    port: 6379
