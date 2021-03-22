@@ -38,13 +38,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         try {
             String grantType = requestAttributes.getRequest().getParameter("grant_type");
             if (LoginConstant.REFRESH_TYPE.equals(grantType.toUpperCase()))
-                username = AdjustUsername(username, loginType);
+                username = adjustUsername(username, loginType);
             switch (loginType) {
                 case LoginConstant.ADMIN_TYPE:
-                    userDetails = LoadSysUserByUsername(username);
+                    userDetails = loadSysUserByUsername(username);
                     break;
                 case LoginConstant.MEMBER_TYPE:
-                    userDetails = LoadMemberUserByUsername(username);
+                    userDetails = loadMemberUserByUsername(username);
                     break;
                 default:
                     throw new AuthenticationServiceException(String.format("暂未支持当前登录方式:%s", loginType));
@@ -62,7 +62,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      * @param loginType
      * @return
      */
-    private String AdjustUsername(String username, String loginType) {
+    private String adjustUsername(String username, String loginType) {
         if (LoginConstant.ADMIN_TYPE.equals(loginType))
             return jdbcTemplate.queryForObject(LoginConstant.QUERY_ADMIN_USER_WITH_ID, String.class, username);
         if (LoginConstant.MEMBER_TYPE.equals(loginType))
@@ -76,7 +76,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      * @param username
      * @return
      */
-    private UserDetails LoadMemberUserByUsername(String username) {
+    private UserDetails loadMemberUserByUsername(String username) {
         return jdbcTemplate.queryForObject(LoginConstant.QUERY_MEMBER_SQL, (rs, i) -> {
             if (rs.wasNull())
                 throw new UsernameNotFoundException(String.format("用户名:%s不存在", username));
@@ -101,7 +101,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      * @param username
      * @return
      */
-    private UserDetails LoadSysUserByUsername(String username) {
+    private UserDetails loadSysUserByUsername(String username) {
         return jdbcTemplate.queryForObject(LoginConstant.QUERY_ADMIN_SQL, (rs, i) -> {
             if (rs.wasNull())
                 throw new UsernameNotFoundException(String.format("用户名:%s不存在", username));
@@ -115,7 +115,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                     true,
                     true,
                     true,
-                    GetSysUserPermissions(id)
+                    getSysUserPermissions(id)
             );
         }, username);
     }
@@ -126,7 +126,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      * @param id
      * @return
      */
-    private Collection<? extends GrantedAuthority> GetSysUserPermissions(long id) {
+    private Collection<? extends GrantedAuthority> getSysUserPermissions(long id) {
         String roleCode = jdbcTemplate.queryForObject(LoginConstant.QUERY_ROLE_CODE_SQL, String.class, id);
         List<String> permissions = null;
         //是否超级管理员

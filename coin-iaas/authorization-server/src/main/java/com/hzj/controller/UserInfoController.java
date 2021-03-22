@@ -16,7 +16,7 @@ public class UserInfoController {
      * @return
      */
     @GetMapping("/user/info")
-    public Principal UserInfo(Principal principal) {
+    public Principal userInfo(Principal principal) {
         return principal;
     }
 }

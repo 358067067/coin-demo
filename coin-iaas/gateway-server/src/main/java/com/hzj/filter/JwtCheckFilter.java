@@ -38,18 +38,18 @@ public class JwtCheckFilter implements GlobalFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         // 先判断是否需要token认证
-        if (IsRequireToken(exchange)) {
+        if (isRequireToken(exchange)) {
             return chain.filter(exchange);
         }
         // 解析token
         String token = getToken(exchange);
         // 判断token
         if (StringUtils.isEmpty(token)) {
-            return BuildNoAuthorizationResult(exchange);
+            return buildNoAuthorizationResult(exchange);
         }
         Boolean hasKey = stringRedisTemplate.hasKey(token);// 检查Redis中是否存在token或过期
         if (hasKey == null || hasKey) {
-            return BuildNoAuthorizationResult(exchange);
+            return buildNoAuthorizationResult(exchange);
         }
         return chain.filter(exchange);
     }
@@ -60,7 +60,7 @@ public class JwtCheckFilter implements GlobalFilter, Ordered {
      * @param exchange
      * @return
      */
-    private Mono<Void> BuildNoAuthorizationResult(ServerWebExchange exchange) {
+    private Mono<Void> buildNoAuthorizationResult(ServerWebExchange exchange) {
         ServerHttpResponse response = exchange.getResponse();
         response.getHeaders().set("Content-type", "application/json");
         response.setStatusCode(HttpStatus.UNAUTHORIZED);
@@ -88,7 +88,7 @@ public class JwtCheckFilter implements GlobalFilter, Ordered {
      * @param exchange
      * @return
      */
-    private boolean IsRequireToken(ServerWebExchange exchange) {
+    private boolean isRequireToken(ServerWebExchange exchange) {
         String path = exchange.getRequest().getURI().getPath();
         if (noRequireTokenUris.contains(path))
             return false;
