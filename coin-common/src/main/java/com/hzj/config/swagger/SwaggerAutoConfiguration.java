@@ -49,7 +49,7 @@ public class SwaggerAutoConfiguration {
     }
 
     private List<? extends SecurityScheme> securitySchemes() {
-        return Arrays.asList(new ApiKey("Token", "Authorization", "Authorization"));
+        return Arrays.asList(new ApiKey("Authorization", "Authorization", "Authorization"));
     }
 
     /**
