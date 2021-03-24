@@ -1,5 +1,7 @@
 package com.hzj.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hzj.domain.SysRole;
 import com.hzj.mapper.SysRoleMapper;
@@ -25,5 +27,14 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         if (!StringUtils.isEmpty(roleCode) && roleCode.equals("ROLE_ADMIN"))
             return true;
         return false;
+    }
+
+    @Override
+    public Page<SysRole> findByPage(Page<SysRole> page, String name) {
+        return page(page, new LambdaQueryWrapper<SysRole>().like(
+                !StringUtils.isEmpty(name),
+                SysRole::getName,
+                name
+        ));
     }
 }
