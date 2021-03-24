@@ -29,7 +29,7 @@ spring:
           lower-case-service-id: true #配置路由大小写
       routes:
         - id: admin-service_router
-          uri: lb://admin-service #转发到服务
+          uri: lb://admin-server #转发到服务
           predicates:
             - Path=/admin/** #请求url
           filters:

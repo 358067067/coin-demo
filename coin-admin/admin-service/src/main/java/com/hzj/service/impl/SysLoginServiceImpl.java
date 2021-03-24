@@ -14,6 +14,7 @@ import com.hzj.service.SysMenuService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -22,6 +23,7 @@ import org.springframework.security.jwt.JwtHelper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,6 +38,9 @@ public class SysLoginServiceImpl implements SysLoginService {
 
     @Autowired
     private SysMenuService sysMenuService;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
     /**
      * 登录
      * @param username
@@ -45,11 +50,11 @@ public class SysLoginServiceImpl implements SysLoginService {
     @Override
     public LoginResult login(String username, String password) {
         log.info("用户{}登录", username);
-        ResponseEntity<JwtToken> tokenResponseEntity = oAuth2FeignClient.getToken("password", username, password, "admin-type", basicToken);
+        ResponseEntity<JwtToken> tokenResponseEntity = oAuth2FeignClient.getToken("password", username, password, "admin_type", basicToken);
         if (tokenResponseEntity.getStatusCode() != HttpStatus.OK)
             throw new ApiException(ApiErrorCode.FAILED);
         JwtToken jwtToken = tokenResponseEntity.getBody();
-        log.info("远程调用成功");
+        log.info("远程调用授权服务器成功,获取的token为{}", JSON.toJSONString(jwtToken,true));
         String token = jwtToken.getAccessToken();
 
         Jwt jwt = JwtHelper.decode(token);
@@ -60,7 +65,10 @@ public class SysLoginServiceImpl implements SysLoginService {
         List<SysMenu> menus = sysMenuService.getMenusByUserId(userId);
 
         JSONArray authoritiesJsonArray = jwtJSON.getJSONArray("authorities");
-        List<SimpleGrantedAuthority> authorities = authoritiesJsonArray.stream().map(a -> new SimpleGrantedAuthority(a.toString())).collect(Collectors.toList());
+        List<SimpleGrantedAuthority> authorities = authoritiesJsonArray.stream()
+                                                            .map(a -> new SimpleGrantedAuthority(a.toString()))
+                                                            .collect(Collectors.toList());
+        redisTemplate.opsForValue().set(token,"", jwtToken.getExpiresIn() , TimeUnit.SECONDS);
         return new LoginResult(token, menus, authorities);
     }
 }

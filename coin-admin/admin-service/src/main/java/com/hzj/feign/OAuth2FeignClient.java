@@ -1,7 +1,5 @@
 package com.hzj.feign;
 
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,8 +7,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(value = "authorization-server")
-@EnableDiscoveryClient
-@EnableFeignClients
 public interface OAuth2FeignClient {
 
     @PostMapping("/oauth/token")

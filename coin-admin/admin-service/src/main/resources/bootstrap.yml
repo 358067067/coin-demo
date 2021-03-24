@@ -8,4 +8,4 @@ spring:
     name: admin-server
   profiles:
     active: dev
-  #读取配置文件的dataID : admin-server-dev.yaml
+#读取配置文件的dataID : admin-server-dev.yaml
