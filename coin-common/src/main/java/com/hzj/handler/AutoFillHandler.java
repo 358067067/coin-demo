@@ -16,7 +16,7 @@ public class AutoFillHandler implements MetaObjectHandler {
      * 新增数据时要添加的为：
      * 1 创建人
      * 2 创建时间
-     * 3 lastupdatetime
+     * 3 修改时间
      *
      * @param metaObject 元对象
      */
@@ -31,8 +31,8 @@ public class AutoFillHandler implements MetaObjectHandler {
 
     /**
      * 更新元对象字段填充（用于更新时对公共字段的填充）
-     * //1 修改人
-     * // 2 修改时间
+     * 1 修改人
+     * 2 修改时间
      *
      * @param metaObject 元对象
      */
