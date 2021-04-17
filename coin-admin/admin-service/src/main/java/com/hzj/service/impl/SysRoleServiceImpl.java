@@ -29,6 +29,12 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         return false;
     }
 
+    /**
+     * 模糊查询
+     * @param page
+     * @param name 角色名称
+     * @return
+     */
     @Override
     public Page<SysRole> findByPage(Page<SysRole> page, String name) {
         return page(page, new LambdaQueryWrapper<SysRole>().like(
