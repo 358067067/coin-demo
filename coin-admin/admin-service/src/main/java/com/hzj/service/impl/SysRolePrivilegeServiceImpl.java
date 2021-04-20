@@ -1,10 +1,12 @@
 package com.hzj.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hzj.domain.SysMenu;
 import com.hzj.domain.SysPrivilege;
 import com.hzj.domain.SysRolePrivilege;
 import com.hzj.mapper.SysRolePrivilegeMapper;
+import com.hzj.model.RolePrivilegesParam;
 import com.hzj.service.SysMenuService;
 import com.hzj.service.SysPrivilegeService;
 import com.hzj.service.SysRolePrivilegeService;
@@ -26,6 +28,9 @@ public class SysRolePrivilegeServiceImpl extends ServiceImpl<SysRolePrivilegeMap
     @Autowired
     private SysPrivilegeService sysPrivilegeService;
 
+    @Autowired
+    private SysRolePrivilegeService sysRolePrivilegeService;
+
     @Override
     public List<SysMenu> findSysMenuAndPrivileges(Long roleId) {
         List<SysMenu> list = sysMenuService.list();
@@ -41,6 +46,27 @@ public class SysRolePrivilegeServiceImpl extends ServiceImpl<SysRolePrivilegeMap
             subMenus.addAll(getChildMenus(rootMenu.getId(), roleId, list));
         }
         return null;
+    }
+
+    @Override
+    public boolean grantPrivileges(RolePrivilegesParam rolePrivilegesParam) {
+        Long roleId = rolePrivilegesParam.getRoleId();
+        // 删除该角色的权限
+        sysRolePrivilegeService.remove(new LambdaQueryWrapper<SysRolePrivilege>().eq(SysRolePrivilege::getRoleId, roleId));
+        List<Long> privilegesIds = rolePrivilegesParam.getPrivilegesIds();
+        if (!CollectionUtils.isEmpty(privilegesIds)) {
+            List<SysRolePrivilege> sysRolePrivileges = new ArrayList<>();
+            for (Long privilegeId : privilegesIds) {
+                SysRolePrivilege sysRolePrivilege = new SysRolePrivilege();
+                sysRolePrivilege.setRoleId(roleId);
+                sysRolePrivilege.setPrivilegeId(privilegeId);
+                sysRolePrivileges.add(sysRolePrivilege);
+            }
+            // 插入新的权限
+            boolean b = sysRolePrivilegeService.saveBatch(sysRolePrivileges);
+            return b;
+        }
+        return true;
     }
 
     /**

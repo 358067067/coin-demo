@@ -39,6 +39,10 @@ public class SysRolePrivilegeController {
             @ApiImplicitParam(name = "rolePrivilegesParam", value = "rolePrivilegesParam")
     })
     public R grantPrivileges(@RequestBody RolePrivilegesParam rolePrivilegesParam) {
-        return R.ok();
+        boolean isOk = sysRolePrivilegeService.grantPrivileges(rolePrivilegesParam);
+        if (isOk)
+            return R.ok("操作成功");
+        else
+            return R.fail("操作失败");
     }
 }
